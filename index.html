@@ -33,7 +33,6 @@
     </header>
 
     <main class="flex-1 overflow-y-auto relative p-4 no-scrollbar pb-28">
-        
         <div id="chat-view" class="space-y-4 flex flex-col justify-end min-h-full">
             <div class="flex items-start space-x-3 max-w-[88%]">
                 <div class="bg-indigo-600/20 w-9 h-9 rounded-xl flex items-center justify-center border border-indigo-500/30 shrink-0 shadow-inner">
@@ -41,7 +40,7 @@
                 </div>
                 <div class="bg-[#111827] border border-slate-800/80 rounded-2xl rounded-tl-none p-4 shadow-xl">
                     <p class="text-sm leading-relaxed text-slate-300">
-                        Yo! Welcome to <span class="text-indigo-400 font-semibold">FlyerForge</span>. I'm your AI design partner. Drop a prompt below for a flyer, banner, or logo, or upload a rough design you want me to perfect for you!
+                        Yo! Welcome to <span class="text-indigo-400 font-semibold">FlyerForge</span>. I'm your AI design partner. Drop a prompt below for a flyer, banner, or logo! Make sure you paste your **Hugging Face Token** in the top right settings.
                     </p>
                 </div>
             </div>
@@ -54,7 +53,6 @@
                         <i class="fa-regular fa-image text-2xl text-slate-500"></i>
                     </div>
                     <p class="text-sm font-medium text-slate-400">Your artwork will forge here</p>
-                    <p class="text-xs text-slate-600 mt-1">Send a design prompt to begin</p>
                 </div>
                 <img id="generated-image" class="hidden w-full h-full object-cover" src="" alt="AI Generated Graphic">
             </div>
@@ -111,7 +109,7 @@
                 <button id="close-modal" class="text-slate-400 hover:text-slate-200 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                Paste your free <span class="text-indigo-400 font-semibold">Hugging Face User Access Token</span> below. This runs the ultra-fast FLUX graphics engine.
+                Paste your free <span class="text-indigo-400 font-semibold">Hugging Face User Access Token</span> below (starts with <code class="text-pink-400">hf_</code>).
             </p>
             <input type="password" id="api-key-input" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full bg-[#0b0f19] border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none mb-4 transition">
             <button id="save-key-btn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 py-3 rounded-xl text-sm font-bold text-white shadow-lg shadow-indigo-500/20 transition active:scale-95">
@@ -124,9 +122,12 @@
         let currentTab = 'chat';
         let uploadedFile = null;
         
-        // Primary and Secondary Fail-Safe Endpoint Configuration
-        const PRIMARY_MODEL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
-        const BACKUP_MODEL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0";
+        // Multi-Model Fail-Safe Array
+        const MODELS = [
+            "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+            "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
+            "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5"
+        ];
 
         const navChat = document.getElementById('nav-chat');
         const navStudio = document.getElementById('nav-studio');
@@ -178,7 +179,7 @@
             const key = apiKeyInput.value.trim();
             if (key) {
                 localStorage.setItem('hf_api_token', key);
-                alert('Token Saved Locally on your phone!');
+                alert('Hugging Face key saved locally on your phone!');
                 settingsModal.classList.add('hidden');
             }
         });
@@ -223,58 +224,61 @@
             chatView.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
 
+        async function tryFetchModel(url, token, prompt) {
+            const response = await fetch(url, {
+                headers: { 
+                    Authorization: `Bearer ${token}`, 
+                    "Content-Type": "application/json",
+                    "X-Wait-For-Model": "true" // Tells server to wake the model up instead of dropping the connection
+                },
+                method: "POST",
+                body: JSON.stringify({ inputs: prompt }),
+            });
+            return response;
+        }
+
         async function forgeGraphic(promptText) {
             const token = localStorage.getItem('hf_api_token');
-            if (!token) {
-                alert("Hold up! Open the sliders icon at top right to paste your Hugging Face API Token.");
+            if (!token || !token.startsWith('hf_')) {
+                alert("Please click the sliders icon (top right) and ensure you enter a valid Hugging Face token starting with hf_");
                 settingsModal.classList.remove('hidden');
                 return;
             }
 
-            let enhancedPrompt = `Professional clean graphic design, ${promptText}, sharp crisp typography, balanced layout, premium brand aesthetic, 8k resolution, high commercial print quality, clean vector lines`;
-            if (uploadedFile) {
-                enhancedPrompt += `, clean up mistakes, fix distortion, fix typographic alignments from uploaded file baseline`;
+            let enhancedPrompt = `Professional clean graphic design, ${promptText}, sharp typography, balanced composition, premium layout, high resolution, clean vector lines`;
+            appendMessage('ai', 'Forging assets... waking engines if asleep. Hold tight for 5-10 seconds.');
+
+            let success = false;
+            let imgUrl = null;
+
+            // Loop through our backup engines if one fails to connect
+            for (let i = 0; i < MODELS.length; i++) {
+                try {
+                    console.log(`Connecting to engine layer ${i + 1}...`);
+                    let response = await tryFetchModel(MODELS[i], token, enhancedPrompt);
+
+                    if (response.ok) {
+                        const imageBlob = await response.blob();
+                        imgUrl = URL.createObjectURL(imageBlob);
+                        success = true;
+                        break;
+                    } else {
+                        console.warn(`Engine layer ${i + 1} responded with status: ${response.status}`);
+                    }
+                } catch (err) {
+                    console.error(`Engine layer ${i + 1} execution break:`, err);
+                }
             }
 
-            appendMessage('ai', 'Forging your graphic assets now... Please wait 5-10 seconds.');
-
-            let activeModelUrl = PRIMARY_MODEL;
-
-            try {
-                let response = await fetch(activeModelUrl, {
-                    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-                    method: "POST",
-                    body: JSON.stringify({ inputs: enhancedPrompt }),
-                });
-
-                // Auto-trigger backup engine if primary model is overloaded (503) or rate-limited (429)
-                if (response.status === 503 || response.status === 429 || response.status === 400) {
-                    console.warn("Primary engine busy. Launching secondary fail-safe generator...");
-                    activeModelUrl = BACKUP_MODEL;
-                    
-                    response = await fetch(activeModelUrl, {
-                        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-                        method: "POST",
-                        body: JSON.stringify({ inputs: enhancedPrompt }),
-                    });
-                }
-
-                if (!response.ok) throw new Error(`Server returned code status: ${response.status}`);
-
-                const imageBlob = await response.blob();
-                const finalImgUrl = URL.createObjectURL(imageBlob);
-
-                appendMessage('ai', 'Done! Check out your brand assets inside the Forge Studio tab.', finalImgUrl);
-
+            if (success && imgUrl) {
+                appendMessage('ai', 'Done! Your design has been generated successfully.', imgUrl);
                 canvasPlaceholder.classList.add('hidden');
-                generatedImage.src = finalImgUrl;
+                generatedImage.src = imgUrl;
                 generatedImage.classList.remove('hidden');
                 studioActions.classList.remove('hidden');
-
                 setTimeout(() => switchTab('studio'), 800);
-
-            } catch (error) {
-                appendMessage('ai', `Generation failed. Quick Fix Checklist:\n1. Ensure your Hugging Face token is active and copied completely.\n2. Ensure the token has "Read" authority under your profile settings account.`);
+            } else {
+                appendMessage('ai', 'All engine layers are currently congested or your token is invalid. Please double-check your Hugging Face key token configurations.');
             }
         }
 
@@ -285,7 +289,7 @@
             let attachedUrl = null;
             if (uploadedFile) attachedUrl = URL.createObjectURL(uploadedFile);
 
-            appendMessage('user', text || "Perfect this layout:", attachedUrl);
+            appendMessage('user', text || "Polish this asset layout:", attachedUrl);
             userInput.value = '';
             
             forgeGraphic(text || "complete clean master polish");
@@ -317,4 +321,4 @@
         });
     </script>
 </body>
-        </html>
+</html>
