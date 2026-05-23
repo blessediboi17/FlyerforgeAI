@@ -3,137 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FlyerForge AI — Your Graphic Design Companion</title>
-    <!-- Tailwind CSS for smooth, mobile-first styling -->
+    <title>FlyerForge AI — Design Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome for clean, thumb-friendly icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Custom scrollbar hiding and safe area spacing for modern smartphones */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         body { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans h-screen flex flex-col justify-between overflow-hidden">
+<body class="bg-[#0b0f19] text-slate-100 font-sans h-screen flex flex-col justify-between overflow-hidden">
 
-    <!-- HEADER -->
-    <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex justify-between items-center z-50">
-        <div class="flex items-center space-x-2">
-            <div class="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
-                <i class="fa-solid fa-fire text-lg text-white animate-pulse"></i>
+    <header class="bg-[#111827]/90 backdrop-blur-xl border-b border-slate-800/60 px-5 py-4 flex justify-between items-center z-50 shadow-lg">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-tr from-indigo-500 to-violet-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20">
+                <i class="fa-solid fa-wand-magic-sparkles text-base text-white"></i>
             </div>
             <div>
-                <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">FlyerForge</h1>
-                <p class="text-xs text-slate-400">AI Design Companion</p>
+                <h1 class="text-xl font-black tracking-wider bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">FLYERFORGE</h1>
+                <div class="flex items-center space-x-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    <p class="text-[10px] font-bold tracking-widest uppercase text-slate-400">AI Graphics System</p>
+                </div>
             </div>
         </div>
-        <!-- Settings button to trigger API Key popup -->
-        <button id="settings-btn" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 transition text-slate-300">
+        <button id="settings-btn" class="w-10 h-10 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/50 flex items-center justify-center active:scale-95 transition text-slate-300 shadow-md">
             <i class="fa-solid fa-sliders text-base"></i>
         </button>
     </header>
 
-    <!-- MAIN INTERACTIVE WORKSPACE -->
-    <main class="flex-1 overflow-y-auto relative p-4 no-scrollbar pb-24">
+    <main class="flex-1 overflow-y-auto relative p-4 no-scrollbar pb-28">
         
-        <!-- VIEW 1: CHAT INTERFACE (Default active view) -->
         <div id="chat-view" class="space-y-4 flex flex-col justify-end min-h-full">
-            <!-- AI Welcome Message -->
-            <div class="flex items-start space-x-3 max-w-[85%]">
-                <div class="bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center border border-slate-700 shrink-0">
-                    <i class="fa-solid fa-robot text-xs text-indigo-400"></i>
+            <div class="flex items-start space-x-3 max-w-[88%]">
+                <div class="bg-indigo-600/20 w-9 h-9 rounded-xl flex items-center justify-center border border-indigo-500/30 shrink-0 shadow-inner">
+                    <i class="fa-solid fa-robot text-sm text-indigo-400"></i>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-none p-3.5 shadow-md">
+                <div class="bg-[#111827] border border-slate-800/80 rounded-2xl rounded-tl-none p-4 shadow-xl">
                     <p class="text-sm leading-relaxed text-slate-300">
-                        Yo! Welcome to **FlyerForge**. I'm your AI design partner. Drop a prompt below for a flyer, banner, or logo, or upload a rough design you want me to perfect for you!
+                        Yo! Welcome to <span class="text-indigo-400 font-semibold">FlyerForge</span>. I'm your AI design partner. Drop a prompt below for a flyer, banner, or logo, or upload a rough design you want me to perfect for you!
                     </p>
                 </div>
             </div>
-
-            <!-- Dynamic message logs will be injected here by app.js -->
         </div>
 
-        <!-- VIEW 2: STUDIO CANVAS (Hidden by default, toggled via nav) -->
-        <div id="studio-view" class="hidden h-full flex flex-col justify-center items-center space-y-4">
-            <div class="w-full aspect-square max-w-sm bg-slate-900 border border-slate-800 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden shadow-2xl group">
-                <!-- Placeholder when no image exists -->
+        <div id="studio-view" class="hidden h-full flex flex-col justify-center items-center p-2">
+            <div class="w-full aspect-square max-w-sm bg-[#111827] border border-slate-800 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden shadow-2xl">
                 <div id="canvas-placeholder" class="text-center p-6">
-                    <i class="fa-regular fa-image text-4xl text-slate-600 mb-2"></i>
-                    <p class="text-sm text-slate-400">Your masterpiece will forge here</p>
+                    <div class="w-16 h-16 rounded-full bg-slate-800/50 flex items-center justify-center mx-auto mb-3 border border-slate-700/40">
+                        <i class="fa-regular fa-image text-2xl text-slate-500"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-400">Your artwork will forge here</p>
+                    <p class="text-xs text-slate-600 mt-1">Send a design prompt to begin</p>
                 </div>
-                <!-- Dynamic Image Result -->
                 <img id="generated-image" class="hidden w-full h-full object-cover" src="" alt="AI Generated Graphic">
             </div>
 
-            <!-- Action Buttons for Generated Image -->
-            <div id="studio-actions" class="hidden flex justify-center space-x-3 w-full max-w-sm">
-                <button id="download-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition py-3 px-4 rounded-xl font-medium text-sm flex items-center justify-center space-x-2 shadow-lg shadow-indigo-500/20">
-                    <i class="fa-solid fa-download"></i>
+            <div id="studio-actions" class="hidden flex justify-center space-x-3 w-full max-w-sm mt-5">
+                <button id="download-btn" class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 active:scale-95 transition py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center space-x-2 shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-arrow-down-to-line"></i>
                     <span>Save to Phone</span>
                 </button>
-                <button id="refine-btn" class="flex-1 bg-slate-800 hover:bg-slate-700 active:scale-95 transition py-3 px-4 rounded-xl font-medium text-sm border border-slate-700 flex items-center justify-center space-x-2">
+                <button id="refine-btn" class="flex-1 bg-slate-800 hover:bg-slate-700 active:scale-95 transition py-3 px-4 rounded-xl font-semibold text-sm border border-slate-700 flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-wand-magic-sparkles text-cyan-400"></i>
-                    <span>Fix / Refine</span>
+                    <span>Fix Design</span>
                 </button>
             </div>
         </div>
     </main>
 
-    <!-- PERSISTENT BOTTOM PROMPT INPUT BAR -->
-    <div class="fixed bottom-16 left-0 right-0 px-4 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent pt-4 pb-2 z-40">
-        <div class="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-2 flex items-center space-x-2 shadow-2xl">
-            <!-- Image Attachment Button -->
-            <button id="attach-btn" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 active:scale-95 transition shrink-0 relative">
-                <i class="fa-solid fa-paperclip text-sm"></i>
+    <div class="fixed bottom-16 left-0 right-0 px-4 bg-gradient-to-t from-[#0b0f19] via-[#0b0f19]/90 to-transparent pt-6 pb-3 z-40">
+        <div class="bg-[#111827]/95 backdrop-blur-xl border border-slate-800/90 rounded-2xl p-2.5 flex items-center space-x-2 shadow-2xl">
+            <button id="attach-btn" class="w-11 h-11 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 active:scale-95 transition flex items-center justify-center shrink-0 border border-slate-700/50 relative">
+                <i class="fa-solid fa-plus text-base"></i>
                 <input type="file" id="file-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
             </button>
-            <!-- Main Text Input -->
-            <input type="text" id="user-input" placeholder="Describe your flyer or logo..." class="flex-1 bg-transparent border-0 outline-none text-sm text-slate-100 placeholder-slate-500 py-2 px-1">
-            <!-- Submit Button -->
-            <button id="send-btn" class="p-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 active:scale-95 transition shrink-0">
+            <input type="text" id="user-input" placeholder="Type a professional flyer design prompt..." class="flex-1 bg-transparent border-0 outline-none text-sm text-slate-100 placeholder-slate-500 py-2 px-2">
+            <button id="send-btn" class="w-11 h-11 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 active:scale-95 transition flex items-center justify-center shrink-0">
                 <i class="fa-solid fa-paper-plane text-sm"></i>
             </button>
         </div>
-        <!-- Small thumbnail tracker showing uploaded image name -->
-        <div id="file-badge" class="hidden text-xs text-cyan-400 mt-1.5 px-2 flex items-center space-x-1">
-            <i class="fa-solid fa-image"></i>
-            <span id="file-name" class="truncate max-w-[200px]">image.jpg</span>
-            <button id="remove-file" class="text-slate-500 hover:text-red-400 ml-1 p-0.5"><i class="fa-solid fa-xmark"></i></button>
+        <div id="file-badge" class="hidden text-xs text-cyan-400 mt-2 px-2 flex items-center space-x-1.5 animate-fade-in">
+            <i class="fa-solid fa-file-image"></i>
+            <span id="file-name" class="truncate max-w-[180px] font-medium">image.jpg</span>
+            <button id="remove-file" class="text-slate-500 hover:text-red-400 ml-1 p-0.5"><i class="fa-solid fa-circle-xmark"></i></button>
         </div>
     </div>
 
-    <!-- MOBILE BOTTOM NAVIGATION TABS -->
-    <nav class="bg-slate-900 border-t border-slate-800 h-16 flex justify-around items-center z-50 fixed bottom-0 left-0 right-0">
-        <button id="nav-chat" class="flex flex-col items-center justify-center space-y-1 w-1/2 h-full text-indigo-400">
-            <i class="fa-solid fa-comments text-lg"></i>
-            <span class="text-[10px] font-medium tracking-wide">AI Companion</span>
+    <nav class="bg-[#111827]/95 backdrop-blur-xl border-t border-slate-800/80 h-16 flex justify-around items-center z-50 fixed bottom-0 left-0 right-0 shadow-2xl">
+        <button id="nav-chat" class="flex flex-col items-center justify-center space-y-1 w-1/2 h-full text-indigo-400 transition-all duration-200">
+            <i class="fa-solid fa-comment-dots text-xl"></i>
+            <span class="text-[11px] font-bold tracking-wide">Design Partner</span>
         </button>
-        <button id="nav-studio" class="flex flex-col items-center justify-center space-y-1 w-1/2 h-full text-slate-500 hover:text-slate-300">
-            <i class="fa-solid fa-palette text-lg"></i>
-            <span class="text-[10px] font-medium tracking-wide">Forge Studio</span>
+        <button id="nav-studio" class="flex flex-col items-center justify-center space-y-1 w-1/2 h-full text-slate-500 hover:text-slate-300 transition-all duration-200">
+            <i class="fa-solid fa-palette text-xl"></i>
+            <span class="text-[11px] font-bold tracking-wide">Forge Studio</span>
         </button>
     </nav>
 
-    <!-- POPUP SETTINGS MODAL (For API Key entry) -->
-    <div id="settings-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-5 shadow-2xl transform transition-all scale-100">
+    <div id="settings-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-[#111827] border border-slate-800 rounded-3xl w-full max-w-sm p-6 shadow-2xl">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-base font-semibold text-slate-100 flex items-center space-x-2">
+                <h3 class="text-base font-bold text-slate-100 flex items-center space-x-2">
                     <i class="fa-solid fa-key text-indigo-400"></i>
-                    <span>API Setup</span>
+                    <span>Hugging Face Setup</span>
                 </h3>
                 <button id="close-modal" class="text-slate-400 hover:text-slate-200 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <p class="text-xs text-slate-400 mb-3 leading-relaxed">
-                Enter your free **Hugging Face Token** to run the design models. Your key is saved locally only in your phone's browser storage.
+            <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+                Paste your free <span class="text-indigo-400 font-semibold">Hugging Face User Access Token</span> below. This runs the ultra-fast FLUX graphics engine.
             </p>
-            <input type="password" id="api-key-input" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none mb-4">
-            <button id="save-key-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 py-2.5 rounded-xl text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition active:scale-95">
-                Save & Secure Key
+            <input type="password" id="api-key-input" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full bg-[#0b0f19] border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none mb-4 transition">
+            <button id="save-key-btn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 py-3 rounded-xl text-sm font-bold text-white shadow-lg shadow-indigo-500/20 transition active:scale-95">
+                Save Securely
             </button>
         </div>
     </div>
-<script src="app.js"></script>
+
+    <script>
+        let currentTab = 'chat';
+        let uploadedFile = null;
+        const HF_MODEL_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
+
+        const navChat = document.getElementById('nav-chat');
+        const navStudio = document.getElementById('nav-studio');
+        const chatView = document.getElementById('chat-view');
+        const studioView = document.getElementById('studio-view');
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsModal = document.getElementById('settings-modal');
+        const closeModal = document.getElementById('close-modal');
+        const apiKeyInput = document.getElementById('api-key-input');
+        const saveKeyBtn = document.getElementById('save-key-btn');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const fileInput = document.getElementById('file-input');
+        const fileBadge = document.getElementById('file-badge');
+        const fileName = document.getElementById('file-name');
+        const removeFileBtn = document.getElementById('remove-file');
+        const canvasPlaceholder = document.getElementById('canvas-placeholder');
+        const generatedImage = document.getElementById('generated-image');
+        const studioActions = document.getElementById('studio-actions');
+        const downloadBtn = document.getElementById('download-btn');
+        const refineBtn = document.getElementById('refine-btn');
+
+        function switchTab(tab) {
+            currentTab = tab;
+            if (tab === 'chat') {
+                navChat.className = "flex flex-col items-center justify-center space-y-1 w-1/2 h-full text-indigo-400 transition-all duration-200";
+                navStudio.className = "flex flex-col items-center justify-center space-y-1 w-1/2 h-full text-slate-500 hover:text-slate-300 transition-all duration-200";
+                chatView.classList.remove('hidden');
+                studioView.classList.add('hidden');
+            } else {
+                navStudio.className = "flex flex-col items-center justify-center space-y-1 w-1/2 h-full text-indigo-400 transition-all duration-200";
+                navChat.className = "flex flex-col items-center justify-center space-y-1 w-1/2 h-full text-slate-500 hover:text-slate-300 transition-all duration-200";
+                studioView.classList.remove('hidden');
+                chatView.classList.add('hidden');
+            }
+        }
+
+        navChat.addEventListener('click', () => switchTab('chat'));
+        navStudio.addEventListener('click', () => switchTab('studio'));
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('hf_api_token');
+            if (savedKey) apiKeyInput.value = savedKey;
+        });
+
+        settingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+        closeModal.addEventListener('click', () => settingsModal.classList.add('hidden'));
+        saveKeyBtn.addEventListener('click', () => {
+            const key = apiKeyInput.value.trim();
+            if (key) {
+                localStorage.setItem('hf_api_token', key);
+                alert('Token Saved Locally!');
+                settingsModal.classList.add('hidden');
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                uploadedFile = file;
+                fileName.textContent = file.name;
+                fileBadge.classList.remove('hidden');
+            }
+        });
+
+        removeFileBtn.addEventListener('click', () => {
+            uploadedFile = null;
+            fileInput.value = '';
+            fileBadge.classList.add('hidden');
+        });
+
+        function appendMessage(sender, text, imageUrl = null) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex items-start space-x-3 max-w-[88%] ${sender === 'user' ? 'self-end flex-row-reverse space-x-reverse' : ''}`;
+            
+            const icon = sender === 'user' ? 'fa-user text-indigo-400' : 'fa-robot text-cyan-400';
+            const bgClass = sender === 'user' ? 'bg-indigo-600 border-indigo-500 rounded-tr-none text-white' : 'bg-[#111827] border-slate-800/80 rounded-tl-none text-slate-300';
+
+            let contentHTML = `<p class="text-sm leading-relaxed">${text}</p>`;
+            if (imageUrl) {
+                contentHTML += `<img src="${imageUrl}" class="mt-2 rounded-xl max-w-full h-auto border border-slate-700" />`;
+            }
+
+            msgDiv.innerHTML = `
+                <div class="bg-slate-800 w-8 h-8 rounded-xl flex items-center justify-center border border-slate-700/60 shrink-0">
+                    <i class="fa-solid ${icon} text-xs"></i>
+                </div>
+                <div class="${bgClass} border rounded-2xl p-3.5 shadow-xl">
+                    ${contentHTML}
+                </div>
+            `;
+            
+            chatView.appendChild(msgDiv);
+            chatView.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+
+        async function forgeGraphic(promptText) {
+            const token = localStorage.getItem('hf_api_token');
+            if (!token) {
+                alert("Hold up! Open the sliders icon at top right to paste your Hugging Face API Token.");
+                settingsModal.classList.remove('hidden');
+                return;
+            }
+
+            let enhancedPrompt = `Professional clean graphic design, ${promptText}, sharp crisp typography, balanced layout, premium brand aesthetic, 8k resolution, high commercial print quality, clean vector lines`;
+            if (uploadedFile) {
+                enhancedPrompt += `, clean up mistakes, fix distortion, fix typographic alignments from uploaded file baseline`;
+            }
+
+            appendMessage('ai', 'Forging your graphic assets now... Please wait 5-10 seconds.');
+
+            try {
+                const response = await fetch(HF_MODEL_URL, {
+                    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+                    method: "POST",
+                    body: JSON.stringify({ inputs: enhancedPrompt }),
+                });
+
+                if (!response.ok) throw new Error(`Server returned code ${response.status}`);
+
+                const imageBlob = await response.blob();
+                const finalImgUrl = URL.createObjectURL(imageBlob);
+
+                appendMessage('ai', 'Done! Check out your brand assets inside the Forge Studio tab.', finalImgUrl);
+
+                canvasPlaceholder.classList.add('hidden');
+                generatedImage.src = finalImgUrl;
+                generatedImage.classList.remove('hidden');
+                studioActions.classList.remove('hidden');
+
+                setTimeout(() => switchTab('studio'), 800);
+
+            } catch (error) {
+                appendMessage('ai', `Error making art: ${error.message}. Double check your Hugging Face token config.`);
+            }
+        }
+
+        function handleSend() {
+            const text = userInput.value.trim();
+            if (!text && !uploadedFile) return;
+
+            let attachedUrl = null;
+            if (uploadedFile) attachedUrl = URL.createObjectURL(uploadedFile);
+
+            appendMessage('user', text || "Perfect this layout:", attachedUrl);
+            userInput.value = '';
+            
+            forgeGraphic(text || "complete clean master polish");
+            
+            uploadedFile = null;
+            fileInput.value = '';
+            fileBadge.classList.add('hidden');
+        }
+
+        sendBtn.addEventListener('click', handleSend);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (!generatedImage.src) return;
+            const dlLink = document.createElement('a');
+            dlLink.href = generatedImage.src;
+            dlLink.download = `FlyerForge-${Date.now()}.jpg`;
+            document.body.appendChild(dlLink);
+            dlLink.click();
+            document.body.removeChild(dlLink);
+        });
+
+        refineBtn.addEventListener('click', () => {
+            switchTab('chat');
+            userInput.placeholder = "Describe corrections...";
+            userInput.focus();
+        });
+    </script>
 </body>
-                  </html>
+</html>
