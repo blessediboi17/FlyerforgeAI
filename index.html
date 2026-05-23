@@ -61,7 +61,7 @@
 
             <div id="studio-actions" class="hidden flex justify-center space-x-3 w-full max-w-sm mt-5">
                 <button id="download-btn" class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 active:scale-95 transition py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center space-x-2 shadow-lg shadow-indigo-500/20">
-                    <i class="fa-solid fa-arrow-down-to-line"></i>
+                    <i class="fa-solid fa-down-to-line"></i>
                     <span>Save to Phone</span>
                 </button>
                 <button id="refine-btn" class="flex-1 bg-slate-800 hover:bg-slate-700 active:scale-95 transition py-3 px-4 rounded-xl font-semibold text-sm border border-slate-700 flex items-center justify-center space-x-2">
@@ -83,7 +83,7 @@
                 <i class="fa-solid fa-paper-plane text-sm"></i>
             </button>
         </div>
-        <div id="file-badge" class="hidden text-xs text-cyan-400 mt-2 px-2 flex items-center space-x-1.5 animate-fade-in">
+        <div id="file-badge" class="hidden text-xs text-cyan-400 mt-2 px-2 flex items-center space-x-1.5">
             <i class="fa-solid fa-file-image"></i>
             <span id="file-name" class="truncate max-w-[180px] font-medium">image.jpg</span>
             <button id="remove-file" class="text-slate-500 hover:text-red-400 ml-1 p-0.5"><i class="fa-solid fa-circle-xmark"></i></button>
@@ -101,7 +101,7 @@
         </button>
     </nav>
 
-    <div id="settings-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
+    <div id="settings-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-[#111827] border border-slate-800 rounded-3xl w-full max-w-sm p-6 shadow-2xl">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-base font-bold text-slate-100 flex items-center space-x-2">
@@ -123,7 +123,10 @@
     <script>
         let currentTab = 'chat';
         let uploadedFile = null;
-        const HF_MODEL_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
+        
+        // Primary and Secondary Fail-Safe Endpoint Configuration
+        const PRIMARY_MODEL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
+        const BACKUP_MODEL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0";
 
         const navChat = document.getElementById('nav-chat');
         const navStudio = document.getElementById('nav-studio');
@@ -175,7 +178,7 @@
             const key = apiKeyInput.value.trim();
             if (key) {
                 localStorage.setItem('hf_api_token', key);
-                alert('Token Saved Locally!');
+                alert('Token Saved Locally on your phone!');
                 settingsModal.classList.add('hidden');
             }
         });
@@ -204,7 +207,7 @@
 
             let contentHTML = `<p class="text-sm leading-relaxed">${text}</p>`;
             if (imageUrl) {
-                contentHTML += `<img src="${imageUrl}" class="mt-2 rounded-xl max-w-full h-auto border border-slate-700" />`;
+                contentHTML += `<img src="${imageUrl}" class="mt-2 rounded-xl max-w-full h-auto border border-slate-700 shadow-md" />`;
             }
 
             msgDiv.innerHTML = `
@@ -235,14 +238,28 @@
 
             appendMessage('ai', 'Forging your graphic assets now... Please wait 5-10 seconds.');
 
+            let activeModelUrl = PRIMARY_MODEL;
+
             try {
-                const response = await fetch(HF_MODEL_URL, {
+                let response = await fetch(activeModelUrl, {
                     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
                     method: "POST",
                     body: JSON.stringify({ inputs: enhancedPrompt }),
                 });
 
-                if (!response.ok) throw new Error(`Server returned code ${response.status}`);
+                // Auto-trigger backup engine if primary model is overloaded (503) or rate-limited (429)
+                if (response.status === 503 || response.status === 429 || response.status === 400) {
+                    console.warn("Primary engine busy. Launching secondary fail-safe generator...");
+                    activeModelUrl = BACKUP_MODEL;
+                    
+                    response = await fetch(activeModelUrl, {
+                        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+                        method: "POST",
+                        body: JSON.stringify({ inputs: enhancedPrompt }),
+                    });
+                }
+
+                if (!response.ok) throw new Error(`Server returned code status: ${response.status}`);
 
                 const imageBlob = await response.blob();
                 const finalImgUrl = URL.createObjectURL(imageBlob);
@@ -257,7 +274,7 @@
                 setTimeout(() => switchTab('studio'), 800);
 
             } catch (error) {
-                appendMessage('ai', `Error making art: ${error.message}. Double check your Hugging Face token config.`);
+                appendMessage('ai', `Generation failed. Quick Fix Checklist:\n1. Ensure your Hugging Face token is active and copied completely.\n2. Ensure the token has "Read" authority under your profile settings account.`);
             }
         }
 
@@ -300,4 +317,4 @@
         });
     </script>
 </body>
-</html>
+        </html>
